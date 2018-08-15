@@ -142,7 +142,7 @@ void DPSrc::Send(CString m_strCommand)
 	{
 		cout << "Please connect to the instrument, no instrument address found \n";
 	}
-	cout << "Sent Command: " << m_strCommand << " \n";
+	//cout << "Sent Command: " << m_strCommand << " \n";
 	InstrWrite(m_strInstrAddr,m_strCommand);
 	m_strResult.Empty();
 }

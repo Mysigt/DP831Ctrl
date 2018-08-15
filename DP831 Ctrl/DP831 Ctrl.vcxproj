@@ -130,7 +130,7 @@
     </ClCompile>
     <ClCompile Include="MotorComm.cpp" />
     <ClCompile Include="SerialPort.cpp" />
-    <ClCompile Include="TestScript.cpp" />
+    <ClCompile Include="1Motor.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DP831.h" />
