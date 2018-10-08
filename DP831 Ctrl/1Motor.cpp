@@ -62,8 +62,8 @@ int main()
 		cin >> Confirm;
 	}
 
-	setStartVal(Src, Motor1, "1", "2"); //Initialize all starting values and limits for motor 1 - note: this does not turn on any of the outputs 
-	setStartVal(Src, Motor2, "1", "2"); //Initialize all starting values and limits for motor 2
+	setStartVal(Src, Motor1, "1", "2",1); //Initialize all starting values and limits for motor 1 - note: this does not turn on any of the outputs 
+	setStartVal(Src, Motor2, "1", "2",2); //Initialize all starting values and limits for motor 2
 
 	int ChConf = 0;
 	//Based on user defined range find the case for motor 2 
@@ -83,9 +83,9 @@ int main()
 	else
 	{
 		ChConf = 3;
-		Src.Send(":OUTP CH2,ON;");//Turn on output from CH2 - should be a positive volt min
+		Src.Send(":OUTP CH2,ON;",2);//Turn on output from CH2 - should be a positive volt min
 	}
-	Src.Send(":OUTP CH1,ON"); //Turn on output from CH1 - should be 0 volts or positive
+	Src.Send(":OUTP CH1,ON",2); //Turn on output from CH1 - should be 0 volts or positive
 
 //	//Loop to handle raster scan
 //	cout << "\n\nSTARTING SCAN \n";
@@ -154,12 +154,3 @@ int main()
 	Src.Send(":OUTP CH1,OFF; :OUTP CH2,OFF;", 1); //Turn off output from all CH 
 	Src.Send(":OUTP CH1,OFF; :OUTP CH2,OFF;", 2);
 }
-//
-//
-//
-/////*TO DO:
-////Add extra argument identifying instrument source in motorcomm header + motorcomm file
-////Amend calls in this file as well so everything is happy good times :)
-////
-
-////*/

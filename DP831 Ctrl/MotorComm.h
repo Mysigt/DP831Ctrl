@@ -16,7 +16,7 @@ struct Motor
 
 void getUserInput(Motor &mtr);
 
-void setStartVal(DPSrc Src, Motor mtr, CString Chan, CString Chan2); //Chan = positive output, Chan 2 = negative output
+void setStartVal(DPSrc Src, Motor mtr, CString Chan, CString Chan2, int instrNum); //Chan = positive output, Chan 2 = negative output
 
 void angleConstraintX(Motor &mtr);
 
