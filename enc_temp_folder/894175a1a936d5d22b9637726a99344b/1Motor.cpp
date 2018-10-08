@@ -7,8 +7,7 @@
 #include "MotorComm.h"
 #include "SerialPort.h"
 
-//To control motor 1, make sure that 2nd arg in send func is 0
-//For motor 2, 2nd arg is 1
+//To control motor 2, make sure that 2nd arg in send func is 2
 //Channel 2 is negative for both sources 
 
 using namespace std;

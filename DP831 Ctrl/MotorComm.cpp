@@ -46,26 +46,33 @@ void getUserInput(Motor &mtr)
 	}
 	else
 	{
-		cout << "Voltage limit for 0.5V/degree is +/- 6.25V" << endl;
-		cout << "Voltage limit for 0.8V/degree and  1V/degree is +/- 10V" << endl << endl;
+		if (mtr.scale == 0.5) 
+		{
+			cout << "\nVoltage limit for 0.5V/degree is +/- 6.25V" << endl << endl;
+		}
+		else 
+		{
+			cout << "\nVoltage limit for 0.8V/degree and  1V/degree is +/- 10V" << endl << endl;
+		}	
 		cout << "Define the voltage range: \n"; 
 		cin >> mtr.vMin >> mtr.vMax;
+		//cout << "Define the number of steps: \n";
+		//cin >> mtr.steps;
 		cout << "Define the voltage increment: (Min value:" << mtr.scale*0.004 << ")" << endl;
 		cin >> mtr.incr;
 	}
 
 	errorHandling(mtr); //check user inputs
-
 	mtr.steps = nearbyint((mtr.vMax - mtr.vMin) / mtr.incr)+1; //Calc. amount of steps - round to nearest even
 
 	mtr.strInc.Format("%.*f;", 3, mtr.incr); //Converts double to CString with 3 sig. digs
 	mtr.strCLim.Format("%.*fA;", 3, mtr.cLim);
 	mtr.strVLim.Format("%.*f;", 3, mtr.vLim);
-	mtr.strVMin.Format("%.*fV,", 3, mtr.vMin);
 }
 
 void setStartVal(DPSrc Src, Motor mtr, CString Chan, CString Chan2, int instrNum)
 {
+	mtr.strVMin.Format("%.*fV,", 3, mtr.vMin);
 	Src.Send(":SOUR" + Chan + ":CURR:PROT " + mtr.strCLim + ":VOLT:PROT " + mtr.strVLim, instrNum); // Apply volt/curr protection to chan
 	if (mtr.vMin > 0) //check for case where using only positive values
 	{
@@ -175,7 +182,7 @@ void dispConf(Motor mtr, Motor mtr2)
 	printf("| Increment: %.3fV = %.3f degrees %18s", mtr.incr, mtr.incr*mtr.scale, "|");
 	printf(" Increment: %.3fV = %.3f degrees %18s\n", mtr2.incr, mtr2.incr*mtr2.scale, "|");
 
-	printf("| Steps: %i %42s Steps: %i %42s\n", mtr.steps, "|", mtr2.steps, "|");
+	printf("| Steps: %3i %41s Steps: %3i %41s\n", mtr.steps, "|", mtr2.steps, "|");
 	cout << left << setw(107) << setfill('=') << "=" << endl << endl;
 
 	cout << "Total number of combined steps: " << mtr.steps * mtr2.steps << endl;
@@ -183,5 +190,3 @@ void dispConf(Motor mtr, Motor mtr2)
 }
 
 
-//To do:
-//Do number of steps instead of increment
