@@ -4,7 +4,6 @@ Write file description here later :3
 
 #include <stdio.h>
 #include <iostream>
-#include <string>
 #include <stdlib.h>
 #include <Windows.h> //need for accessing sleep function - change for LINUX
 #include <atlstr.h> //defines CString
@@ -107,8 +106,10 @@ void DPSrc::Connect()
 	memset(instrDesc, 0, 1000);
 	status = viFindRsrc(defaultRM, expr, findList, retCount, instrDesc);
 
+	int instrNum = 0; //to keep track of number of instruments for assigning addresses
 	for (i = 0; i < (*retCount); i++)
 	{
+		
 		strSrc.Format("%s", instrDesc);
 		InstrWrite(strSrc, "*IDN?"); //command to identify VISA description of instrument
 		::Sleep(200);
@@ -118,8 +119,8 @@ void DPSrc::Connect()
 		if (strInstr.Find("DP") >= 0)  //if instrument is found as being in DP series break out of loop 
 		{
 			bFindDP = true;
-			m_strInstrAddr = strSrc; //Set instrument address for communication
-			break;
+			m_strInstrAddr[instrNum] = strSrc; //Set instrument address for communication
+			instrNum++;
 		}
 		status = viFindNext(*findList, instrDesc);
 	}
@@ -131,26 +132,27 @@ void DPSrc::Connect()
 	else
 	{
 		cout << "Connection successful \n";
-		cout << "\nDevice: " << strInstr << "\n";
+		cout << "\nDevices: " << m_strInstrAddr[0] << endl << "         "
+			 << m_strInstrAddr[1] << endl;
 	}
 }
 
 //Send command to connected instrument
-void DPSrc::Send(CString m_strCommand)
+void DPSrc::Send(CString m_strCommand, int instrNum)
 {
-	if (m_strInstrAddr.IsEmpty())
+	if (m_strInstrAddr[0].IsEmpty() && m_strInstrAddr[1].IsEmpty())
 	{
 		cout << "Please connect to the instrument, no instrument address found \n";
 	}
 	//cout << "Sent Command: " << m_strCommand << " \n";
-	InstrWrite(m_strInstrAddr,m_strCommand);
+	InstrWrite(m_strInstrAddr[instrNum],m_strCommand);
 	m_strResult.Empty();
 }
 
 //Read from connected instrument
-void DPSrc::Read()
+void DPSrc::Read(int instrNum)
 {
-	InstrRead(m_strInstrAddr, &m_strResult);
+	InstrRead(m_strInstrAddr[instrNum], &m_strResult);
 	cout << "Read:" << m_strResult << '\n';
 }
 

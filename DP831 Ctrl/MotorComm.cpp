@@ -33,7 +33,9 @@ void getUserInput(Motor &mtr)
 	if (select == 'D' || select == 'd') //not case sensitive check for degree pref
 	{
 		double deg, degMin, degMax;
-		cout << "Define the mechanical movement range: " << endl << "Max angles: +12.5...." << endl; //finish comment about info
+		cout << "Maximum scanning angle is +/- 12.5 degrees for SF 0.5 V/degree and 0.8V/degree"<< endl;
+		cout << "Maximum scanning angle is +/- 10 degrees for SF of 1V/degree"<< endl << endl;
+		cout << "Define the mechanical movement range: " << endl; //finish comment about info
 		cin >> degMin >> degMax;
 		cout << "Define the mechanical degree increment: (Min value: 0.004 degrees)"; //max direction in x is +/- 8 degrees for 5mm beam diameter
 		cin >> deg;
@@ -44,6 +46,8 @@ void getUserInput(Motor &mtr)
 	}
 	else
 	{
+		cout << "Voltage limit for 0.5V/degree is +/- 6.25V" << endl;
+		cout << "Voltage limit for 0.8V/degree and  1V/degree is +/- 10V" << endl << endl;
 		cout << "Define the voltage range: \n"; 
 		cin >> mtr.vMin >> mtr.vMax;
 		cout << "Define the voltage increment: (Min value:" << mtr.scale*0.004 << ")" << endl;
@@ -60,24 +64,24 @@ void getUserInput(Motor &mtr)
 	mtr.strVMin.Format("%.*fV,", 3, mtr.vMin);
 }
 
-void setStartVal(DPSrc Src, Motor mtr, CString Chan, CString Chan2)
+void setStartVal(DPSrc Src, Motor mtr, CString Chan, CString Chan2, int instrNum)
 {
-	Src.Send(":SOUR" + Chan + ":CURR:PROT " + mtr.strCLim + ":VOLT:PROT " + mtr.strVLim); // Apply volt/curr protection to chan
+	Src.Send(":SOUR" + Chan + ":CURR:PROT " + mtr.strCLim + ":VOLT:PROT " + mtr.strVLim, instrNum); // Apply volt/curr protection to chan
 	if (mtr.vMin > 0) //check for case where using only positive values
 	{
-		Src.Send(":APPL CH" + Chan + "," + + mtr.strVMin + mtr.strCLim); // Set starting output voltage for chan
+		Src.Send(":APPL CH" + Chan + "," + + mtr.strVMin + mtr.strCLim, instrNum); // Set starting output voltage for chan
 	}
 	else
 	{
-		Src.Send(":APPL CH" + Chan + ",0," + mtr.strCLim); // Set starting output voltage for chan
+		Src.Send(":APPL CH" + Chan + ",0," + mtr.strCLim, instrNum); // Set starting output voltage for chan
 	}
-		Src.Send(":SOUR" + Chan + ":VOLT:IMM:STEP " + mtr.strInc); // Set voltage increment
+		Src.Send(":SOUR" + Chan + ":VOLT:IMM:STEP " + mtr.strInc, instrNum); // Set voltage increment
 
 	//to handle the negative part of the voltage sweep
 	if (Chan2 != "0")
 	{
-		Src.Send(":SOUR" + Chan2 + ":CURR:PROT " + mtr.strCLim + ":VOLT:PROT -" + mtr.strVLim); //Negative is necessary as limit is defined as a positve 
-		Src.Send(":APPL CH" + Chan2 + "," + mtr.strVMin + mtr.strCLim);
+		Src.Send(":SOUR" + Chan2 + ":CURR:PROT " + mtr.strCLim + ":VOLT:PROT -" + mtr.strVLim, instrNum); //Negative is necessary as limit is defined as a positve 
+		Src.Send(":APPL CH" + Chan2 + "," + mtr.strVMin + mtr.strCLim, instrNum);
 	}
 }
 
@@ -121,7 +125,7 @@ void errorHandling(Motor &mtr)
 		cout << endl << "Increment is below defined limit, setting increment to 0.004 degrees"<< endl;
 		mtr.incr = 0.004 * mtr.scale;
 	}
-	if (fmod((mtr.vMax - mtr.vMin), mtr.incr) > 0.00000000000000000000000001) 
+	if (fmod((mtr.vMax - mtr.vMin), mtr.incr) > 0.0000000000000001) 
 	{
 		int temp;
 		temp = nearbyint((mtr.vMax - mtr.vMin) / mtr.incr);
@@ -130,34 +134,54 @@ void errorHandling(Motor &mtr)
 	}
 }
 
+void angleConstraintX(Motor &mtr)
+{
+	if (mtr.vMax > 8 * mtr.scale)
+	{
+		mtr.vMax = 8 * mtr.scale;
+	}
+	if (mtr.vMin < -8 * mtr.scale)
+	{
+		mtr.vMin = -8 * mtr.scale;
+	}
+}
+
+void angleConstraintY(Motor &mtr)
+{
+	if (mtr.vMin < -3 * mtr.scale)
+	{
+		mtr.vMin = -3 * mtr.scale;
+	}
+}
+
 void dispConf(Motor mtr, Motor mtr2)
 {
-	const char sep = ' ';
-	const int nameWidth = 8;
-	const int numWidth = 48;
+	int totalRunTime; //total time to execute measurement
+	totalRunTime = ((mtr.measTime * mtr.steps) + (mtr2.measTime * mtr2.steps)) / 1000; //time in seconds
 
-	cout << fixed;
-	cout.precision(3);
 	cout << "\n\nSummary of parameters:" << endl << endl;
-	cout << setw(25) << "Motor 1" << setw(25) << "| |" << setw(25) << "Motor 2" << endl;
-	cout << left << setw(100) << setfill('=') << "=" << endl;
-	cout << left << setw(nameWidth) << setfill(sep) << "Minimum voltage:" << mtr.vMin << "V  ";
-	cout << left << setw(nameWidth) << setfill(sep) << "Maximum voltage:" << mtr.vMax << "V  ";
-	cout << setw(2) << setfill(sep) << "|" << setw(nameWidth+1) << setfill(sep);
+	cout << left << setw(107) << setfill('=') << "=" << endl;
+	printf("|%29s%25s%29s%23s\n", "Motor 1", "| |", "Motor 2", "|");
+	cout << left << setw(107) << setfill('=') << "=" << endl;
 
-	cout << left << setw(nameWidth) << setfill(sep) << "Minimum voltage:" << mtr2.vMin << "V  ";
-	cout << left << setw(nameWidth) << setfill(sep) << "Maximum voltage:" << mtr2.vMax << "V" << endl;
+	printf("| Voltage sweep: %+ 7.3fV -> %+ 7.3fV %16s", mtr.vMin, mtr.vMax, "|");
+	printf(" Voltage sweep: %+ 7.3fV -> %+ 7.3fV %16s\n", mtr2.vMin, mtr2.vMax, "|");
 
-	cout << "Increment:" << mtr.incr << "V";
-	cout << right << setw(numWidth - 14) << setfill(sep) << "| ";
-	cout << left << "Increment:" << mtr2.incr << "V" << endl;
+	printf("| Degree sweep: %+7.3f -> %+ 7.3f %19s", mtr.vMin*mtr.scale, mtr.vMax * mtr.scale, "|");
+	printf(" Degree sweep: %+ 7.3f -> %+ 7.3f %19s\n", mtr2.vMin* mtr2.scale, mtr2.vMax* mtr2.scale, "|");
 
-	cout << "Steps:" << mtr.steps;
-	cout << right << setw(numWidth - 5) << setfill(sep) << "| ";
-	cout << "Steps:" << left << mtr2.steps << endl;
+	printf("| Scale: %.1f V/degree %32s Scale: %0.1f V/degree %32s\n", mtr.scale, "|", mtr2.scale, "|");
+
+	printf("| Increment: %.3fV = %.3f degrees %18s", mtr.incr, mtr.incr*mtr.scale, "|");
+	printf(" Increment: %.3fV = %.3f degrees %18s\n", mtr2.incr, mtr2.incr*mtr2.scale, "|");
+
+	printf("| Steps: %i %42s Steps: %i %42s\n", mtr.steps, "|", mtr2.steps, "|");
+	cout << left << setw(107) << setfill('=') << "=" << endl << endl;
+
+	cout << "Total number of combined steps: " << mtr.steps * mtr2.steps << endl;
+	printf("Scan time: %ih:%im:%is \n", totalRunTime / 3600, (totalRunTime % 3600) / 60, (totalRunTime % 3600) % 60);
 }
 
 
 //To do:
-//Fix increment - so that precision is at 3
 //Do number of steps instead of increment

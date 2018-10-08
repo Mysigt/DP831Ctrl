@@ -128,6 +128,7 @@
     <ClCompile Include="DP831.cpp">
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
+    <ClCompile Include="LicSet.cpp" />
     <ClCompile Include="MotorComm.cpp" />
     <ClCompile Include="SerialPort.cpp" />
     <ClCompile Include="1Motor.cpp" />
