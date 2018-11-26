@@ -6,7 +6,7 @@
 
 struct Motor
 {
-	double cLim = 1.8; //Limit as written in documentation for the board
+	double cLim = 1; //Limit as written in documentation for the board
 	double vLim = 10; // Default that will be overridden if 0.5 scaling is defined by from user
 	double scale, vMin, vMax;
 	double incr, measTime;
@@ -16,7 +16,7 @@ struct Motor
 
 void getUserInput(Motor &mtr);
 
-void setStartVal(DPSrc Src, Motor mtr, CString Chan, CString Chan2, int instrNum); //Chan = positive output, Chan 2 = negative output
+void setStartVal(DPSrc Src, Motor mtr, CString Chan, CString Chan2, int instrNum); //Chan = positive output, Chan 2 = negative output instrNum = address location of source
 
 void angleConstraintX(Motor &mtr);
 

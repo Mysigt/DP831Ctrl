@@ -37,7 +37,7 @@ int main()
 
 	Motor Motor1, Motor2;
 	char Confirm = 'N'; 
-	char UserDef = '1'; //Change to another character if you want to defone during run-time
+	char UserDef; //Change to another character if you want to define during run-time
 	while (Confirm != 'Y' && Confirm != 'y')
 	{
 		char resp;
@@ -48,13 +48,13 @@ int main()
 		if (UserDef == '1')
 		{
 			//FILL IN DEFAULT TEST SCRIPT
-			Motor1.measTime = 0;
-			Motor1.cLim = 1;
-			Motor1.incr = 0.1;
-			Motor1.scale = 0.8;
-			Motor1.steps = 10;
-			Motor1.vMin = 1;
-			Motor1.vMax = 10;
+			Motor1.measTime = 0; //Delay between increment in ms
+			Motor1.cLim = 1; // Amps
+			Motor1.incr = 0.5; //Volts
+			Motor1.scale = 1; //Volt/ degree
+			Motor1.steps = 10;  
+			Motor1.vMin = -3; //Volts
+			Motor1.vMax = 3; //Volts
 
 			Motor2.measTime = 0;
 			Motor2.cLim = 1;
@@ -110,7 +110,6 @@ int main()
 	}
 	else if (Motor2.vMin < 0 && Motor2.vMax > 0) //Negative to positive voltage
 	{
-		ChConf = 2;
 		Src.Send(":OUTP CH2,ON;",1);//Turn on output from CH2 - should be a negative volt min
 		Src.Send(":OUTP CH1,ON;",1); //Turn on output from CH1 - should be 0
 	}
