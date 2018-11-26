@@ -67,11 +67,11 @@ int main()
 
 			Motor1.strInc.Format("%.*f;", 3, Motor1.incr); //Converts double to CString with 3 sig. digs
 			Motor1.strCLim.Format("%.*fA;", 3, Motor1.cLim);
-			Motor1.strVLim.Format("%.*f;", 3, Motor1.vLim);
+			//Motor1.strVLim.Format("%.*f;", 3, Motor1.vLim);
 
 			Motor2.strInc.Format("%.*f;", 3, Motor2.incr); //Converts double to CString with 3 sig. digs
 			Motor2.strCLim.Format("%.*fA;", 3, Motor2.cLim);
-			Motor2.strVLim.Format("%.*f;", 3, Motor2.vLim);
+			//Motor2.strVLim.Format("%.*f;", 3, Motor2.vLim);
 		}
 		else 
 		{ 
