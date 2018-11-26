@@ -37,25 +37,57 @@ int main()
 
 	Motor Motor1, Motor2;
 	char Confirm = 'N'; 
-
+	char UserDef = '1'; //Change to another character if you want to defone during run-time
 	while (Confirm != 'Y' && Confirm != 'y')
 	{
 		char resp;
-		cout << "USER DEFINED PARAMS: Supply limits, voltage range, voltage degree scale factor, degree increment, measurement time" << endl;
-		cout << "Motor 1 controls X-axis movement, Motor 2 controls Y-axis movement" << endl;
-		cout << "\nWill the same parameters be used for both mirrors? Y/N" << endl;
-		cin >> resp;
-		if (resp == 'Y' || resp == 'y')
+		cout << "USER DEFINED PARAMS: Supply limits, voltage range, voltage degree scale factor, degree increment, measurement time" 
+		        "\nMotor 1 controls X-axis movement, Motor 2 controls Y-axis movement"
+				"\nWould you like to use default params(1) or set them yourself?";
+		cin >> UserDef;
+		if (UserDef == '1')
 		{
-			getUserInput(Motor1); //Get user defined params
-			Motor2 = Motor1; // Copy params to second motor
-		}
-		else
-		{
-			getUserInput(Motor1); //Get user defined params for motor 1
-			getUserInput(Motor2); //Get user defined params for motor 2
-		}
+			//FILL IN DEFAULT TEST SCRIPT
+			Motor1.measTime = 0;
+			Motor1.cLim = 1;
+			Motor1.incr = 0.1;
+			Motor1.scale = 0.8;
+			Motor1.steps = 10;
+			Motor1.vMin = 1;
+			Motor1.vMax = 10;
 
+			Motor2.measTime = 0;
+			Motor2.cLim = 1;
+			Motor2.incr = 0.1;
+			Motor2.scale = 0.8;
+			Motor2.steps = 10;
+			Motor2.vMin = 1;
+			Motor2.vMax = 10;
+		
+
+			Motor1.strInc.Format("%.*f;", 3, Motor1.incr); //Converts double to CString with 3 sig. digs
+			Motor1.strCLim.Format("%.*fA;", 3, Motor1.cLim);
+			Motor1.strVLim.Format("%.*f;", 3, Motor1.vLim);
+
+			Motor2.strInc.Format("%.*f;", 3, Motor2.incr); //Converts double to CString with 3 sig. digs
+			Motor2.strCLim.Format("%.*fA;", 3, Motor2.cLim);
+			Motor2.strVLim.Format("%.*f;", 3, Motor2.vLim);
+		}
+		else 
+		{ 
+			cout << "\nWill the same parameters be used for both mirrors? Y/N" << endl;
+			cin >> resp;
+			if (resp == 'Y' || resp == 'y')
+			{
+				getUserInput(Motor1); //Get user defined params
+				Motor2 = Motor1; // Copy params to second motor
+			}
+			else
+			{
+				getUserInput(Motor1); //Get user defined params for motor 1
+				getUserInput(Motor2); //Get user defined params for motor 2
+			}
+		}
 		angleConstraintX(Motor1); //constrain x-direction
 		angleConstraintY(Motor2); //constrain y-direction
 		dispConf(Motor1, Motor2);
@@ -157,3 +189,6 @@ int main()
 	Src.Send(":OUTP CH1,OFF; :OUTP CH2,OFF;", 0); //Turn off output from all CH 
 	Src.Send(":OUTP CH1,OFF; :OUTP CH2,OFF;", 1);
 }
+
+//Right now fully functional so long as voltage range is perfectly divisible by increment
+//Need to fix for all scenarios

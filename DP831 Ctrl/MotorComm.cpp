@@ -67,13 +67,13 @@ void getUserInput(Motor &mtr)
 
 	mtr.strInc.Format("%.*f;", 3, mtr.incr); //Converts double to CString with 3 sig. digs
 	mtr.strCLim.Format("%.*fA;", 3, mtr.cLim);
-	mtr.strVLim.Format("%.*f;", 3, mtr.vLim);
+	//mtr.strVLim.Format("%.*f;", 3, mtr.vLim);
 }
 
 void setStartVal(DPSrc Src, Motor mtr, CString Chan, CString Chan2, int instrNum)
 {
 	mtr.strVMin.Format("%.*fV,", 3, mtr.vMin);
-	Src.Send(":SOUR" + Chan + ":CURR:PROT " + mtr.strCLim + ":VOLT:PROT " + mtr.strVLim, instrNum); // Apply volt/curr protection to chan
+	Src.Send(":SOUR" + Chan + ":CURR:PROT " + mtr.strCLim, instrNum); // Apply curr protection to chan
 	if (mtr.vMin > 0) //check for case where using only positive values
 	{
 		Src.Send(":APPL CH" + Chan + "," + + mtr.strVMin + mtr.strCLim, instrNum); // Set starting output voltage for chan
@@ -87,7 +87,7 @@ void setStartVal(DPSrc Src, Motor mtr, CString Chan, CString Chan2, int instrNum
 	//to handle the negative part of the voltage sweep
 	if (Chan2 != "0")
 	{
-		Src.Send(":SOUR" + Chan2 + ":CURR:PROT " + mtr.strCLim + ":VOLT:PROT -" + mtr.strVLim, instrNum); //Negative is necessary as limit is defined as a positve 
+		Src.Send(":SOUR" + Chan2 + ":CURR:PROT " + mtr.strCLim, instrNum); //Negative is necessary as limit is defined as a positve 
 		Src.Send(":APPL CH" + Chan2 + "," + mtr.strVMin + mtr.strCLim, instrNum);
 	}
 }
